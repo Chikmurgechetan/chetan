@@ -1,119 +1,134 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Expense Tracker</title>
-        <style>
-            
-            body{
-                background-color: darkgrey;
-                text-align: center;
-            }
-        </style>
-    </head>
-    <body>
-        <h1 style="color:red">Expense Tracker</h1>
-        <hr/>
-        <form onsubmit="saveToLocalStorage(event)">
-            <label>Chose ExpenseAmount</label>
-            <br/>
-            <input type="amount" id="amount" name="expenseAmount" required/>
-           <br/>
-            <label>Chose Description</label>
-            <br>
-            <input type="text" id="description" name="description" required/>
-            <br/>
-            <label>Chose a Category</label>
-            <br/>
-            <select id="category" name="category" required>
-                <option value="Movie">Movie</option>
-                <option value="fual">Fuel</option>
-                <option value="Stationary">Stationary</option>
-                <option value="food">Food</option>          
-            </select>
-            <br/>
-            <hr>
-            <button value="Add Expense">Add Expense</button>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Admine page with total stack value(crud crud)</title>
+    <style>
+     body{
+
+      background-color: lightblue;
+     }
+     h1{
+      color:red;
+     }
+     
+    </style>
+ </head>
+<body>
+    <form onsubmit="saveToLocalStorage(event)">
+        <label>Selling Price</label>
+        <br>
+         <input type="number" name="Price" id="Price" required/>
+         <br>
+        <label>Product Name</label>
+        <br>
+        <input type="name" name="Name" id="Name" required/>
+        <br>
+        <button value="Add Product">Add Product</button>
+        <h1>Products</h1>
+    <hr>
         </form>
-        
-        <ul id='ExpenseDetails'></ul>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.2/axios.min.js"></script>
-        <script>
-            function saveToLocalStorage(event){
-                event.preventDefault();
-                const amount=event.target.expenseAmount.value;
-                const description=event.target.description.value;
-                const category=event.target.category.value;
-                const obj = {
-                    amount:amount,
-                    description:description,
-                    category:category
-                }
+    <ul id="ProductDetails"></ul>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.0/axios.min.js"></script>
+    <script>
+        function saveToLocalStorage(event){
+            event.preventDefault();
+            const Price=event.target.Price.value;
+            const Name=event.target.Name.value;
+          
+            const obj = {
+              Price:Price,
+              Name:Name,
+               }
 
-            axios.post("https://crudcrud.com/api/fca5673f01f749b1aca65eeb51191ac0/ExpenseDetails",obj)
-            .then((response)=>{
-                showNewExpenseOnTheScreen(response.data)
-                //console.log(response)
-            })
-            .catch((error)=>{
-                console.log(error)
-            })
-        
-            }
-            window.addEventListener("DOMContentLoaded", (event) => {
-                axios.get("https://crudcrud.com/api/fca5673f01f749b1aca65eeb51191ac0/ExpenseDetails")
-                .then((response)=>{
+         axios.post("https://crudcrud.com/api/71c19662f78b422e9343ae1e8cc8c85a/ProductDetails",obj)
+         .then((response)=>{
+          showNewProdutsDetaailsOnScreen(response.data)
+
+
+         })
+         .catch((error)=>{
+           console.log(error)
+         })
+
+
+
+     
+      }
+      window.addEventListener("DOMContentLoaded", (event) => {
+           axios.get("https://crudcrud.com/api/71c19662f78b422e9343ae1e8cc8c85a/ProductDetails") 
+           .then((response)=>{
                     console.log(response)
-
-                    for(var i=0;i<response.data.length;i++)
+                         for(var i=0;i<response.data.length;i++)
                     {
-                        showNewExpenseOnTheScreen(response.data[i])
+                      showNewProdutsDetaailsOnScreen(response.data[i])
                     }
                 })
-                
+                 .catch((error)=>{
+                    console.log(error)
+                })
+               })
 
-                .catch((erro)=>{
-                    console.log(erro)
-                })
-              
-                })
+
+            
+            var totalPrice=0;
+      function showNewProdutsDetaailsOnScreen(Products)
+      {
+        const parentNode=document.getElementById("ProductDetails");
+        const childHTML=`<li id=${Products._id}>${Products.Price}-${Products.Name}
+            <button onclick=deletProduct('${Products._id}','${Products.Price}') >Delet Product</button>
+            </li>`
+       
+        parentNode.innerHTML=parentNode.innerHTML+childHTML;
+       
+       
+        var totalPriceH3 = document.getElementById("TotalPriceH3")
+        totalPrice += Products.Price++;
+        totalPriceH3.innerHTML=`TotalPrice of Produts  :- Rs ${totalPrice}`;
         
-            function showNewExpenseOnTheScreen(Expense){
-                document.getElementById('amount').value='';
-                document.getElementById('description').value='';
-                document.getElementById('category').value='';
+        
+        
+      }
+       
+      function deletProduct(Product_id,Price)
+      {
+       
+        axios.delete(`https://crudcrud.com/api/71c19662f78b422e9343ae1e8cc8c85a/ProductDetails/${Product_id}`)
+        .then((response)=>{
+          removeProductOnScreen(Product_id,Price);
+        })
+         .catch((error)=>{
+          console.log(error);
+         })
 
-                 const parentNode=document.getElementById('ExpenseDetails')
-                 const childHtml=`<li id=${Expense._id}>${Expense.amount}-${Expense.description}-${Expense.category}
-                     <button onClick=deleteExpense('${Expense._id}')>Delete Exepnse</button>
-                     <button onClick=editExpense('${Expense.amount}','${Expense.description}','${Expense.category}','${Expense._id}')>Edite Expense</button>
-                                            </li>`
 
-                 parentNode.innerHTML=parentNode.innerHTML+childHtml;
-            }
-               function editExpense(amount,description,category,ExepnseId){
-                 document.getElementById('amount').value=amount;
-                document.getElementById('description').value=description;
-                document.getElementById('category').value=category;
 
-                 deleteExpense(ExepnseId);
-               }
 
-               function deleteExpense(ExepnseId){
-                axios.delete(`https://crudcrud.com/api/fca5673f01f749b1aca65eeb51191ac0/ExpenseDetails/${ExepnseId}`)
-                .then((response)=>{
-                    removeExpensesFromScreen(ExepnseId);
-                })
-               // console.log(amount);
-                //localStorage.removeItem(amount);
-                //removeExpensesFromScreen(amount);
-               }
-             function removeExpensesFromScreen(ExepnseId){
-                const parentNode=document.getElementById('ExpenseDetails')
-                const childNodeToBeDeleted=document.getElementById(ExepnseId);
-                
-                parentNode.removeChild(childNodeToBeDeleted);
-             }
-          
-        </script>
-    </body>
+       
+      } 
+    
+      function removeProductOnScreen(Product_id,Price)
+      {
+        const parentNode=document.getElementById('ProductDetails');
+        const childNodeToBeDeleted=document.getElementById(Product_id,Price);
+        parentNode.removeChild(childNodeToBeDeleted)
+        console.log(Price);
+        var totalPriceH3 = document.getElementById("TotalPriceH3")
+        totalPrice -=parseInt( Price);
+        totalPriceH3.innerHTML=`TotalPrice of Produts  :- Rs ${totalPrice}`;
+        
+      }
+      
+
+
+     </script>
+     <hr>
+    <h3 id="TotalPriceH3">The total Price of Products Rs</h3>
+
+     
+ 
+
+</body>
 </html>
